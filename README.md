@@ -11,7 +11,7 @@ O projeto é dividido em dois grandes pilares que se complementam:
 
 ### 🎯 Missão e Valor
 
-[cite\_start]A missão principal é transformar a **participação cidadã em impacto legislativo real**[cite: 3].
+A missão principal é transformar a **participação cidadã em impacto legislativo real**[cite: 3].
 
 | Atributo | Descrição Detalhada |
 | :--- | :--- |
