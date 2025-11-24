@@ -2,145 +2,130 @@
 
 ## ✨ 1. Visão Geral do Projeto
 
-A **SOF.IA** é uma solução de Engajamento Cidadão Inteligente que une a facilidade do WhatsApp com a análise de dados robusta para a gestão pública.
+A **SOF.IA** é uma solução completa de **Engajamento Cidadão Inteligente** que conecta moradores, gestão pública e negócios locais. Ela utiliza um fluxo inteligente via **WhatsApp** e um **Dashboard Web** de monitoramento para modernizar a comunicação cívica.
 
-O projeto é dividido em dois grandes pilares que se complementam:
+A missão é traduzir informações complexas em orientações simples e acionáveis, transformando a interação em **inteligência acionável** para a gestão pública.
 
-1.  **Agente Inteligente (SOF.IA):** O motor de comunicação e processamento de linguagem natural (LN), responsável por coletar, filtrar e estruturar dados via WhatsApp.
-2.  **Dashboard SOF.IA:** A interface web de gestão, responsável por visualizar métricas em tempo real, demandas georreferenciadas e fornecer suporte à decisão governamental.
+### 🎯 Proposta de Valor
 
-### 🎯 Missão e Valor
-
-A missão principal é transformar a **participação cidadã em impacto legislativo real**[cite: 3].
-
-| Atributo | Descrição Detalhada |
-| :--- | :--- |
-| **Acessibilidade** | Garante que **qualquer pessoa** entenda leis e registre demandas, traduzindo informações complexas em orientações simples e acionáveis. |
-| **Filtragem de Dados** | A IA classifica demandas por tipo e urgência, garantindo que o volume de interações se transforme em **inteligência acionável** para gestores. |
-| **Mercado** | [cite\_start]Atua no mercado GovTech, focado em **5.570 prefeituras no Brasil** e câmaras legislativas[cite: 50, 51]. |
+  * **Acessibilidade:** Permite que qualquer pessoa entenda leis, registre demandas e participe, utilizando a **linguagem natural** do WhatsApp.
+  * **Inteligência:** A SOF.IA coleta dados estruturados sobre denúncias, necessidades e interesses (problemas de infraestrutura, solicitações de serviços) e os organiza em um painel analítico.
+  * **Eficiência:** Cidades podem **priorizar demandas reais**, reduzir retrabalho e acompanhar a resolução de problemas de forma mais eficiente.
 
 -----
 
-## 🏗️ 2. Arquitetura do Sistema e Fluxo de Dados
+## 👥 2. Equipe de Desenvolvimento
 
-O sistema é construído sobre uma arquitetura full-stack, onde o N8N atua como o **motor de integração** primário.
+  * **Giovanna Carvalho de Moraes** - `giovannamilena50@gmail.com`
+  * **Matheus Costa** - `matheushenri26@outlook.com`
+  * **Jesus Felipe Candian Silva** - `felipecandian95@gmail.com`
+  * **Pedro Henrique Santiago Siqueira** - `pedro.santiagosiqueira@gmail.com`
 
-### 2.1. Fluxo de Dados (Ponta a Ponta)
+-----
 
-O fluxo segue uma progressão lógica:
+## 🏗️ 3. Arquitetura do Sistema
 
-1.  **Cidadão (WhatsApp):** Interage em linguagem natural.
-2.  **Automação (n8n + OpenAI):** Recebe, processa, filtra o ruído e estrutura a demanda.
-3.  **Backend (Spring Boot):** Recebe os dados estruturados via HTTP/REST e armazena.
-4.  **Database (PostgreSQL):** Persistência dos dados de gestão e métricas.
-5.  **Dashboard (React/Vite):** Consome os dados do Backend para visualização e análise.
+O sistema utiliza uma arquitetura full-stack, com o **n8n** gerenciando o fluxo de mensagens e a **IA** (OpenAI) garantindo a classificação dos dados.
 
-### 2.2. Tecnologias Utilizadas
+### 3.1. Fluxo de Comunicação
 
-| Camada | Componente | Detalhes e Versões |
+O fluxo integra o canal do cidadão ao sistema de gestão:
+
+1.  **Cidadãos (WhatsApp):** Interagem com o Agente SOF.IA.
+2.  **n8n + OpenAI (Automação):** Recebe e processa a mensagem, aplicando o filtro de qualidade e estruturando os dados.
+3.  **Backend (Spring Boot):** Recebe os dados estruturados via HTTP/REST e gerencia a lógica de negócios e segurança.
+4.  **Database (PostgreSQL):** Armazena as demandas, métricas e o histórico da IA.
+
+### 3.2. Tecnologias Utilizadas
+
+| Camada | Tecnologia | Detalhes |
 | :--- | :--- | :--- |
-| **Frontend** | Dashboard | **React 18**, **TypeScript**, **Vite** (Build), **Tailwind CSS** (UI), **Recharts** (Gráficos). |
-| **Backend** | API de Gestão | **Spring Boot 3.4**, **Java 17+**, **Spring Security** (Autenticação). |
-| **Persistência** | Banco de Dados | **PostgreSQL** (Produção), **H2** (Desenvolvimento), **Flyway** (Migração). |
-| **Automação** | Workflow | **N8N** (Orquestração), **Redis** (Buffer), **Evolution API** (WhatsApp), **OpenAI/Gemini** (IA/Análise). |
+| **Frontend** | **React 18** / **Vite** | Interfaces, **shadcn/ui** (componentes), **Recharts** (gráficos). |
+| **Backend** | **Spring Boot 3.4** / **Java 17+** | **Spring Security** (autenticação), **Spring Data JPA** (persistência). |
+| **Database** | **PostgreSQL** / **H2** | PostgreSQL (Produção), H2 (Desenvolvimento), **Flyway** (migração). |
+| **Automação** | **n8n** / **OpenAI** | Orquestração do WhatsApp, **filtragem de qualidade** e categorização automática. |
 
 -----
 
-## ⚙️ 3. Detalhamento do Workflow N8N
+## 💡 4. Funcionalidades Detalhadas
 
-O N8N é o motor de triagem e inteligência da SOF.IA.
-
-### 3.1. Entrada e Automação de Leads
-
-O fluxo inicial garante que a comunicação seja tratada e o usuário identificado:
-
-  * **Webhook EVO:** Ponto de entrada das mensagens.
-  * **Dados:** Extrai o `pushName` e o `remoteJid` (Número).
-  * **Consulta se o Lead existe:** Verifica no **PostgreSQL/Supabase** se o número já está cadastrado.
-  * **já\_existe\_numero (IF/Else):** Direciona para `criar_lead` (Supabase) se for o primeiro contato.
-
-### 3.2. Tratamento de Mídia e Contexto (Buffer)
-
-O sistema lida com áudio e fragmentação de mensagens:
-
-  * **Switch1:** Roteia a mensagem por tipo (`audioMessage`, `imageMessage`, `conversation`).
-      * **Áudio:** Transcrição via `HTTP Request1` (Groq/Whisper).
-      * **Imagens:** Análise multimodal via `Analyze an image` (Gemini).
-  * **Buffer (Redis):** O sistema `push` / `Wait` / `junta_msgs` usa o **Redis** para armazenar o histórico recente, garantindo que a IA receba o contexto completo e não mensagens fragmentadas.
-
-### 3.3. Agente de IA e Decisão Estratégica
-
-O motor de IA aplica a lógica de negócios e o filtro de qualidade:
-
-  * **AI Agent:** Processa o contexto usando um LLM (OpenAI `gpt-5-mini`), com memória persistente (`Chat` - PostgreSQL) e ferramentas externas, como `salvaBancoDados`.
-  * **Prompt de Sistema:** Fornece o papel acolhedor da SOF.IA e o fluxo de coleta de dados (Nome, Idade, Bairro/Rua) e o fluxo de registro de problemas.
-  * **Structured Output Parser:** Força a IA a retornar dados em **JSON** para decisões binárias e estruturação da informação, facilitando o consumo pelo Backend do Dashboard.
-  * **Divisão e Envio:** A resposta da IA é segmentada (`divide_msgs` / `Split Out`) em mensagens curtas para simular uma conversa natural antes de ser enviada via `Enviar texto`.
+| Módulo | Funcionalidades |
+| :--- | :--- |
+| **Dashboard Principal** | **Métricas em tempo real**, Visualização de interações por localização, Análise demográfica por faixa etária e Indicadores de performance municipal. |
+| **Gestão de Demandas** | **Interações via WhatsApp**, **Mapa de ocorrências**, Upload e visualização de fotos (evidências), e **Categorização automática** (IA). |
+| **Consultas Governamentais** | **Chat com IA Sofia** para esclarecimentos sobre leis municipais, Análise de regulamentações e Suporte a decisões administrativas. |
+| **Métricas e Analytics** | **Questões urgentes identificadas por IA**, Análise de tendências temporais, Métricas de engajamento cidadão e Relatórios exportáveis. |
 
 -----
 
-## 💻 4. Guia de Execução e Desenvolvimento
+## 💻 5. Como Executar o Projeto
 
-### 4.1. Pré-requisitos de Desenvolvimento
-
-Certifique-se de ter as seguintes versões instaladas localmente:
+### 5.1. Pré-requisitos
 
   * **Node.js 18+**
   * **Java 17+**
   * **npm** ou **yarn**
+  * **N8N** configurado e rodando com acesso às APIs (Evolution, OpenAI, Redis, etc.).
 
-### 4.2. Execução Local
-
-Execute o Backend e o Frontend separadamente, garantindo que o N8N esteja ativo.
-
-#### 1\. Backend (Spring Boot)
+### 5.2. Executar o Backend (Spring Boot)
 
 ```bash
 # Navegar para o diretório do backend
 cd c:\Users\Giovanna\IdeaProjects\Sofia\sofia
+
 # Executar o backend
 .\mvnw.cmd spring-boot:run
 ```
 
-> **Endpoints Principais:**
->
->   * Health Check: `GET /actuator/health`
->   * Métricas: `GET /metrics/dashboard`
->   * H2 Console: `http://localhost:8080/h2-console`
+> O backend estará disponível em: `http://localhost:8080`
 
-#### 2\. Frontend (Dashboard React/Vite)
+### 5.3. Executar o Frontend (React/Vite)
 
 ```bash
 # Navegar para o diretório do frontend
 cd "C:\Users\{user}\OneDrive\Área de Trabalho\city-pulse-dashboard"
+
 # Instalar dependências
 npm install
+
 # Executar o frontend
 npm run dev
 ```
 
-> O Dashboard estará disponível em: `http://localhost:5173`
+> O frontend estará disponível em: `http://localhost:5173`
 
-### 4.3. Testes e Deploy
+### 5.4. Endpoints e Configuração
 
-  * **Testes de Integração:** Use o script `test-integration.bat` para verificar a comunicação completa entre as camadas.
-  * **Deploy Completo:** O script `deploy-full-stack.bat` gerencia o deploy do Frontend e Backend.
-  * **Plataformas Recomendadas:** Frontend (Vercel, Netlify); Backend (Railway, Render, Heroku); Banco (Supabase, PlanetScale).
+  * **Endpoints Principais (Backend):** Health Check: `GET /actuator/health`, Métricas: `GET /metrics/dashboard`, H2 Console: `http://localhost:8080/h2-console`.
+  * **Configuração do Backend:** O arquivo `application.properties` define a conexão com o H2 para desenvolvimento.
+  * **Configuração do Frontend:** O arquivo `.env.local` deve apontar para o Backend: `VITE_API_URL=http://localhost:8080`.
+
+### 5.5. Estrutura do Projeto
+
+```
+city-pulse-dashboard/
+├── src/
+│   ├── components/     # Componentes React (shadcn/ui)
+│   ├── pages/          # Páginas da aplicação (Dashboard)
+│   ├── services/       # Serviços de API (Comunicação com o Backend)
+├── sofia/              # Backend Spring Boot (Lógica de API)
+├── .n8n/               # Workflow da Automação SOF.IA
+└── dist/               # Build de produção
+```
 
 -----
 
-## 🤝 5. Contribuição e Licença
+## 🤝 6. Contribuição e Licença
 
-### Contribuição
+### 6.1. Contribuição
 
-Este projeto segue as práticas de **Conventional Commits** para padronização das mensagens de commit.
+Este projeto segue as práticas de **Conventional Commits**.
 
-| Tipo | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `feat` | Nova funcionalidade | `feat(dashboard): adicionar métricas em tempo real` |
-| `fix` | Correção de bug | `fix(api): corrigir endpoint de autenticação` |
-| `docs` | Alterações na documentação | `docs(readme): atualizar instruções de instalação` |
+  * Faça um `fork` do projeto.
+  * Crie uma `branch` para sua feature (ex: `git checkout -b feat/nova-funcionalidade`).
+  * Commit suas mudanças seguindo o padrão (ex: `git commit -m 'feat: adicionar nova funcionalidade'`).
+  * Abra um **Pull Request**.
 
-### Licença
+### 6.2. Licença
 
 Este projeto está licenciado sob a **MIT License**.
