@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { Users, MessageSquare, CheckCircle2, Star, Download, Eye, FileText, ExternalLink, Image, Filter } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,8 @@ import { Search } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { apiService } from '@/services/api';
+import { useMetrics } from '@/hooks/useMetrics';
 
 const interactionsData = [
   { 
@@ -326,6 +328,34 @@ export default function CityDashboard() {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedIssue, setSelectedIssue] = useState(null);
   const [selectedNeighborhood, setSelectedNeighborhood] = useState('all');
+  const [contextData, setContextData] = useState(null);
+  
+  const { 
+    dashboardMetrics, 
+    timeSeriesData, 
+    categoriesData, 
+    urgentIssues, 
+    loading 
+  } = useMetrics();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log('🔄 Buscando dados da API...');
+        const [contextData, interactionsData, opinionsData] = await Promise.all([
+          apiService.getContext(),
+          apiService.getUserInteractions(),
+          apiService.getOpinions()
+        ]);
+        console.log('✅ Dados recebidos:', { contextData, interactionsData, opinionsData });
+        setContextData({ contextData, interactionsData, opinionsData });
+      } catch (error) {
+        console.error('❌ Erro ao buscar dados:', error);
+        setContextData({ contextData: [], interactionsData: [], opinionsData: [] });
+      }
+    };
+    fetchData();
+  }, []);
 
   const getFilteredData = () => {
     if (selectedNeighborhood === 'all') {

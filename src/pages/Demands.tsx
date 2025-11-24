@@ -1,428 +1,345 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Plus, Heart, MapPin, Calendar, Users, TrendingUp, Share2, Eye, Clock, Target } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Filter, MapPin, Calendar, User, Image, Phone, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { apiService } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMetrics } from "@/hooks/useMetrics";
 
-const mockDemands = [
-  {
-    id: 'WPP-001',
-    title: 'Preservação do Centro Histórico',
-    description: 'Movimento cidadão via WhatsApp para proteção e revitalização do patrimônio histórico. Mais de 500 mensagens de apoio.',
-    neighborhood: 'Centro',
-    city: 'São Paulo',
-    category: 'Movimento Social',
-    status: 'trending',
-    whatsappLikes: 1247,
-    whatsappShares: 89,
-    impactoPotencial: 'Alto',
-    custoEstimado: 'R$ 2.5M',
-    prazoExecucao: '18 meses',
-    detalhes: {
-      populacaoAfetada: '15.000 pessoas',
-      beneficiosEconomicos: 'Aumento de 30% no turismo local',
-      sustentabilidade: 'Uso de materiais eco-friendly',
-      parceriasNecessarias: ['Secretaria de Cultura', 'IPHAN', 'Empresas locais']
-    },
-    date: '2025-01-20',
-    image: true,
-    source: 'whatsapp',
-    movement: 'Movimento Preserva Centro'
-  },
-  {
-    id: 'WPP-002',
-    title: 'Mais Segurança no Jardim das Flores',
-    description: 'Demanda popular via WhatsApp por mais policiamento e iluminação. Grupo de moradores organizados.',
-    neighborhood: 'Jardim das Flores',
-    city: 'São Paulo',
-    category: 'Segurança',
-    status: 'debate',
-    whatsappLikes: 892,
-    whatsappShares: 67,
-    impactoPotencial: 'Médio',
-    custoEstimado: 'R$ 800K',
-    prazoExecucao: '8 meses',
-    detalhes: {
-      populacaoAfetada: '8.500 pessoas',
-      beneficiosEconomicos: 'Redução de 40% nos crimes noturnos',
-      sustentabilidade: 'Melhoria na qualidade de vida',
-      parceriasNecessarias: ['Polícia Militar', 'Guarda Municipal', 'Associação de Moradores']
-    },
-    date: '2025-01-18',
-    image: true,
-    source: 'whatsapp',
-    movement: 'Coletivo Jardim Seguro'
-  },
-  {
-    id: 'PL-123/2025',
-    title: 'Iluminação LED nas Ruas',
-    description: 'Projeto oficial para substituição de toda iluminação pública por LED.',
-    neighborhood: 'Vila Nova',
-    city: 'São Paulo',
-    category: 'Infraestrutura',
-    status: 'analise',
-    whatsappLikes: 456,
-    whatsappShares: 23,
-    impactoPotencial: 'Médio',
-    custoEstimado: 'R$ 1.2M',
-    prazoExecucao: '12 meses',
-    detalhes: {
-      populacaoAfetada: '12.000 pessoas',
-      beneficiosEconomicos: 'Economia de 25% na conta de energia',
-      sustentabilidade: 'Redução de 60% no consumo energético',
-      parceriasNecessarias: ['Companhia Elétrica', 'Empresas de LED']
-    },
-    date: '2025-01-15',
-    image: false,
-    source: 'oficial'
-  },
-  {
-    id: 'WPP-003',
-    title: 'Campanha Árvores para Todos',
-    description: 'Movimento ambiental via WhatsApp para plantio de árvores nativas. Engajamento crescente.',
-    neighborhood: 'Parque Industrial',
-    city: 'São Paulo',
-    category: 'Meio Ambiente',
-    status: 'trending',
-    whatsappLikes: 678,
-    whatsappShares: 45,
-    impactoPotencial: 'Alto',
-    custoEstimado: 'R$ 500K',
-    prazoExecucao: '6 meses',
-    detalhes: {
-      populacaoAfetada: '25.000 pessoas',
-      beneficiosEconomicos: 'Criação de 150 empregos verdes',
-      sustentabilidade: 'Plantio de 5.000 árvores nativas',
-      parceriasNecessarias: ['Secretaria do Meio Ambiente', 'ONGs ambientais']
-    },
-    date: '2025-01-22',
-    image: true,
-    source: 'whatsapp',
-    movement: 'Verde Urbano SP'
-  },
-  {
-    id: 'WPP-004',
-    title: 'Transporte Público Acessível',
-    description: 'Mobilização via WhatsApp por ônibus adaptados e pontos acessíveis para pessoas com deficiência.',
-    neighborhood: 'Vila Esperança',
-    city: 'São Paulo',
-    category: 'Movimento Social',
-    status: 'debate',
-    whatsappLikes: 534,
-    whatsappShares: 31,
-    impactoPotencial: 'Alto',
-    custoEstimado: 'R$ 1.8M',
-    prazoExecucao: '24 meses',
-    detalhes: {
-      populacaoAfetada: '3.200 pessoas',
-      beneficiosEconomicos: 'Inclusão social e produtiva',
-      sustentabilidade: 'Acessibilidade universal',
-      parceriasNecessarias: ['Secretaria de Transporte', 'Associações PCD']
-    },
-    date: '2025-01-19',
-    image: false,
-    source: 'whatsapp',
-    movement: 'Acessibilidade Já'
-  },
-  {
-    id: 'PL-124/2025',
-    title: 'Coleta Seletiva Porta a Porta',
-    description: 'Expansão oficial do programa de coleta seletiva para todos os bairros.',
-    neighborhood: 'Centro',
-    city: 'São Paulo',
-    category: 'Limpeza',
-    status: 'aprovado',
-    whatsappLikes: 234,
-    whatsappShares: 12,
-    impactoPotencial: 'Baixo',
-    custoEstimado: 'R$ 300K',
-    prazoExecucao: '4 meses',
-    detalhes: {
-      populacaoAfetada: '45.000 pessoas',
-      beneficiosEconomicos: 'Redução de 15% nos custos de limpeza',
-      sustentabilidade: 'Reciclagem de 80% dos resíduos',
-      parceriasNecessarias: ['Cooperativas de Reciclagem', 'Empresas de Coleta']
-    },
-    date: '2025-01-10',
-    image: false,
-    source: 'oficial'
-  }
-];
+interface UserInteraction {
+  id: number;
+  name: string;
+  whatsappNumber: string;
+  age: number;
+  interactionDate: string;
+  localizacao: string;
+  estado: string;
+  cidade: string;
+  bairro: string;
+}
 
-const statusLabels = {
-  novo: 'Novo',
-  trending: 'Em Alta',
-  analise: 'Em Análise',
-  debate: 'Em Debate',
-  aprovado: 'Aprovado',
-  resolvido: 'Resolvido',
-};
-
-const statusColors = {
-  novo: 'bg-blue-100 text-blue-700',
-  trending: 'bg-red-100 text-red-700',
-  analise: 'bg-yellow-100 text-yellow-700',
-  debate: 'bg-orange-100 text-orange-700',
-  aprovado: 'bg-green-100 text-green-700',
-  resolvido: 'bg-gray-100 text-gray-700',
-};
-
-export default function Demands() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [sourceFilter, setSourceFilter] = useState('all');
+const Demands = () => {
   const { profile } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [interactions, setInteractions] = useState<UserInteraction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  
+  const { interactionMetrics } = useMetrics();
+  const cityName = profile?.city_name || 'São Paulo';
 
-  const getEngagementScore = (demand: any) => {
-    return demand.whatsappLikes + (demand.whatsappShares * 3);
+  useEffect(() => {
+    loadInteractions();
+  }, []);
+
+  const loadInteractions = async () => {
+    try {
+      const data = await apiService.getUserInteractions();
+      setInteractions(data);
+    } catch (error) {
+      console.error('Erro ao carregar interações:', error);
+      // Mock data for demonstration
+      setInteractions([
+        {
+          id: 1,
+          name: "João Silva",
+          whatsappNumber: "+5511999999999",
+          age: 35,
+          interactionDate: "2024-01-15T10:30:00",
+          localizacao: "BAIRRO",
+          estado: "SP",
+          cidade: "São Paulo",
+          bairro: "Centro"
+        },
+        {
+          id: 2,
+          name: "Maria Santos",
+          whatsappNumber: "+5511888888888",
+          age: 42,
+          interactionDate: "2024-01-14T14:20:00",
+          localizacao: "CIDADE",
+          estado: "SP",
+          cidade: "São Paulo",
+          bairro: "Jardim Paulista"
+        }
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredDemands = mockDemands
-    .filter((demand) => {
-      const matchesSearch = demand.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           demand.description.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = statusFilter === 'all' || demand.status === statusFilter;
-      const matchesCategory = categoryFilter === 'all' || demand.category === categoryFilter;
-      const matchesSource = sourceFilter === 'all' || demand.source === sourceFilter;
-      const matchesRole = profile?.role === 'city' || demand.neighborhood === profile?.neighborhood_name;
-      
-      return matchesSearch && matchesStatus && matchesCategory && matchesSource && matchesRole;
-    })
-    .sort((a, b) => getEngagementScore(b) - getEngagementScore(a));
+  const getLocationColor = (localizacao: string) => {
+    switch (localizacao) {
+      case "CIDADE": return "bg-blue-100 text-blue-800";
+      case "BAIRRO": return "bg-green-100 text-green-800";
+      case "ESTADO": return "bg-purple-100 text-purple-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const filteredInteractions = interactions.filter(interaction =>
+    interaction.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    interaction.cidade.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    interaction.bairro?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const mockImages = [
+    { id: 1, url: "/placeholder.svg", location: "Centro - Buraco na rua", date: "2024-01-15" },
+    { id: 2, url: "/placeholder.svg", location: "Jardim - Iluminação", date: "2024-01-14" },
+    { id: 3, url: "/placeholder.svg", location: "Vila - Limpeza", date: "2024-01-13" }
+  ];
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64">Carregando...</div>;
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Demandas</h1>
-          <p className="text-muted-foreground">Gerencie e acompanhe as demandas da comunidade</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
-            <Eye className="h-4 w-4" />
-            Análise Detalhada
-          </Button>
-          <Button className="gap-2">
-            <Plus className="h-4 w-4" />
-            Nova Demanda
-          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">Demandas dos Cidadãos</h1>
+          <p className="text-muted-foreground">
+            Interações via WhatsApp, mapa de ocorrências e evidências fotográficas
+          </p>
         </div>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por lei, tema ou palavra-chave..."
-                className="pl-10"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+      {/* Estatísticas */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Interações</CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{interactionMetrics.total.toLocaleString()}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Nível Cidade</CardTitle>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {interactionMetrics.cityLevel.toLocaleString()}
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os Status</SelectItem>
-                <SelectItem value="novo">Novo</SelectItem>
-                <SelectItem value="trending">Em Alta</SelectItem>
-                <SelectItem value="analise">Em Análise</SelectItem>
-                <SelectItem value="debate">Em Debate</SelectItem>
-                <SelectItem value="aprovado">Aprovado</SelectItem>
-                <SelectItem value="resolvido">Resolvido</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                <SelectItem value="Movimento Social">Movimento Social</SelectItem>
-                <SelectItem value="Infraestrutura">Infraestrutura</SelectItem>
-                <SelectItem value="Segurança">Segurança</SelectItem>
-                <SelectItem value="Meio Ambiente">Meio Ambiente</SelectItem>
-                <SelectItem value="Limpeza">Limpeza</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sourceFilter} onValueChange={setSourceFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Origem" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas as Origens</SelectItem>
-                <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                <SelectItem value="oficial">Oficial</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Nível Bairro</CardTitle>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {interactionMetrics.neighborhoodLevel.toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Hoje</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {interactionMetrics.today.toLocaleString()}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-      <div className="space-y-4">
-        {filteredDemands.map((demand) => (
-          <Dialog key={demand.id}>
-            <DialogTrigger asChild>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-4">
-                    {demand.image && (
-                      <div className="w-full md:w-32 h-32 rounded-lg bg-muted flex items-center justify-center">
-                        <span className="text-xs text-muted-foreground">Foto</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-primary">{demand.id}</span>
-                            <Badge className={statusColors[demand.status as keyof typeof statusColors]}>
-                              {statusLabels[demand.status as keyof typeof statusLabels]}
-                            </Badge>
-                            {demand.source === 'whatsapp' && (
-                              <Badge variant="outline" className="bg-green-50 text-green-700">
-                                WhatsApp
-                              </Badge>
-                            )}
-                            {demand.movement && (
-                              <Badge variant="outline" className="bg-purple-50 text-purple-700">
-                                <Users className="h-3 w-3 mr-1" />
-                                {demand.movement}
-                              </Badge>
-                            )}
-                          </div>
-                          <h3 className="text-lg font-semibold text-foreground">{demand.title}</h3>
-                          <p className="text-sm text-muted-foreground">{demand.description}</p>
-                        </div>
-                        
-                        <div className="flex flex-col gap-2 shrink-0 min-w-[120px]">
-                          <div className="text-right">
-                            <div className="text-lg font-semibold text-primary">
-                              {getEngagementScore(demand)}
-                            </div>
-                            <div className="text-xs text-muted-foreground">Engajamento</div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-1 text-xs">
-                            <div className="flex items-center gap-1 text-red-600">
-                              <Heart className="h-3 w-3" />
-                              {demand.whatsappLikes}
-                            </div>
-                            <div className="flex items-center gap-1 text-green-600">
-                              <Share2 className="h-3 w-3" />
-                              {demand.whatsappShares}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            <span>{demand.city} → {demand.neighborhood}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            <span>{new Date(demand.date).toLocaleDateString('pt-BR')}</span>
-                          </div>
-                          <Badge variant="outline">{demand.category}</Badge>
-                          {demand.status === 'trending' && (
-                            <div className="flex items-center gap-1 text-red-600">
-                              <TrendingUp className="h-4 w-4" />
-                              <span className="font-medium">Tendência</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
-                          <span>Impacto: <strong>{demand.impactoPotencial}</strong></span>
-                          <span><strong>{demand.custoEstimado}</strong></span>
-                          <span>Prazo: <strong>{demand.prazoExecucao}</strong></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl">
-              <DialogHeader>
-                <DialogTitle>{demand.title}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold text-primary mb-1">
-                      {getEngagementScore(demand)}
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-3">Score de Engajamento</div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Curtidas:</span>
-                        <span>{demand.whatsappLikes}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Compartilhamentos:</span>
-                        <span>{demand.whatsappShares}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold text-green-600 mb-1">
-                      {demand.custoEstimado}
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-3">Investimento</div>
-                    <div className="space-y-1 text-sm">
-                      <div>Impacto: <strong>{demand.impactoPotencial}</strong></div>
-                      <div>Prazo: <strong>{demand.prazoExecucao}</strong></div>
-                    </div>
-                  </div>
-                  <div className="p-4 rounded-lg border">
-                    <div className="text-2xl font-semibold text-blue-600 mb-1">
-                      {demand.detalhes?.populacaoAfetada}
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-3">População Beneficiada</div>
-                    <div className="text-sm">
-                      <div>{demand.neighborhood}</div>
-                    </div>
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Lista de Interações</CardTitle>
+              <CardDescription>
+                Interações via WhatsApp por localização
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Filtros e Busca */}
+              <div className="flex gap-2 items-center mb-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    placeholder="Buscar..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 text-sm"
+                  />
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium mb-2">Benefícios Econômicos</h4>
-                      <p className="text-sm text-muted-foreground">{demand.detalhes?.beneficiosEconomicos}</p>
+              </div>
+
+              {/* Lista de Interações */}
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {filteredInteractions.map((interaction) => (
+                  <div key={interaction.id} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="space-y-1">
+                        <div className="font-medium text-sm flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          {interaction.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Idade: {interaction.age} anos</div>
+                      </div>
+                      <Badge className={getLocationColor(interaction.localizacao)} variant="outline">
+                        {interaction.localizacao}
+                      </Badge>
                     </div>
-                    <div>
-                      <h4 className="font-medium mb-2">Sustentabilidade</h4>
-                      <p className="text-sm text-muted-foreground">{demand.detalhes?.sustentabilidade}</p>
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-3 w-3" />
+                        <span>{interaction.whatsappNumber}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3 w-3" />
+                        <span>{interaction.cidade}, {interaction.estado}</span>
+                        {interaction.bairro && <span> - {interaction.bairro}</span>}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-3 w-3" />
+                        <span>{new Date(interaction.interactionDate).toLocaleString('pt-BR')}</span>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <h4 className="font-medium mb-2">Parcerias Necessárias</h4>
-                    <div className="space-y-1">
-                      {demand.detalhes?.parceriasNecessarias.map((parceria, index) => (
-                        <div key={index} className="text-sm p-2 bg-gray-50 rounded">
-                          {parceria}
-                        </div>
-                      ))}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Mapa de Ocorrências - {cityName}</CardTitle>
+              <CardDescription>
+                Clique nos marcadores para ver fotos e mensagens do local
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-96 rounded-lg relative overflow-hidden">
+                <iframe
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=-46.8,-23.7,-46.4,-23.4&layer=mapnik&marker=-23.55,-46.63`}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  className="rounded-lg"
+                ></iframe>
+                
+                {/* Overlay markers for neighborhoods */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute top-1/4 left-1/3 cursor-pointer group pointer-events-auto" onClick={() => setSelectedLocation('centro')}>
+                    <div className="w-8 h-8 bg-red-500 rounded-full border-3 border-white shadow-lg animate-pulse group-hover:scale-125 transition-transform flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">12</span>
+                    </div>
+                    <div className="absolute top-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                      Centro - 12 reports
+                    </div>
+                  </div>
+                  
+                  <div className="absolute top-1/2 right-1/4 cursor-pointer group pointer-events-auto" onClick={() => setSelectedLocation('jardim')}>
+                    <div className="w-8 h-8 bg-orange-500 rounded-full border-3 border-white shadow-lg animate-pulse group-hover:scale-125 transition-transform flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">8</span>
+                    </div>
+                    <div className="absolute top-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                      Jardim - 8 reports
+                    </div>
+                  </div>
+                  
+                  <div className="absolute bottom-1/4 left-1/2 cursor-pointer group pointer-events-auto" onClick={() => setSelectedLocation('vila')}>
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full border-3 border-white shadow-lg animate-pulse group-hover:scale-125 transition-transform flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">5</span>
+                    </div>
+                    <div className="absolute top-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                      Vila - 5 reports
+                    </div>
+                  </div>
+                  
+                  <div className="absolute top-3/4 right-1/3 cursor-pointer group pointer-events-auto" onClick={() => setSelectedLocation('industrial')}>
+                    <div className="w-8 h-8 bg-purple-500 rounded-full border-3 border-white shadow-lg animate-pulse group-hover:scale-125 transition-transform flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">3</span>
+                    </div>
+                    <div className="absolute top-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-2 py-1 rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                      Industrial - 3 reports
                     </div>
                   </div>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        ))}
+              
+              {selectedLocation && (
+                <div className="mt-4 p-4 border rounded-lg bg-white">
+                  <div className="flex justify-between items-start mb-3">
+                    <h4 className="font-semibold">
+                      {selectedLocation === 'centro' && `Centro de ${cityName} - Av. Principal`}
+                      {selectedLocation === 'jardim' && `Jardim das Flores - ${cityName}`}
+                      {selectedLocation === 'vila' && `Vila Nova - ${cityName}`}
+                      {selectedLocation === 'industrial' && `Distrito Industrial - ${cityName}`}
+                    </h4>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedLocation(null)}>×</Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <h5 className="font-medium mb-2 flex items-center gap-2">
+                        <Image className="h-4 w-4" />
+                        Fotos ({selectedLocation === 'centro' ? '12' : selectedLocation === 'jardim' ? '8' : selectedLocation === 'vila' ? '5' : '3'})
+                      </h5>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[1,2,3].map(i => (
+                          <div key={i} className="aspect-square bg-gray-200 rounded border flex items-center justify-center">
+                            <Image className="h-6 w-6 text-gray-400" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium mb-2 flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4" />
+                        Mensagens Recentes
+                      </h5>
+                      <div className="space-y-2 text-sm">
+                        {selectedLocation === 'centro' && (
+                          <>
+                            <p className="p-2 bg-gray-50 rounded">"Buraco grande na pista, cuidado!" - João</p>
+                            <p className="p-2 bg-gray-50 rounded">"Já é a terceira vez que reporto" - Maria</p>
+                          </>
+                        )}
+                        {selectedLocation === 'jardim' && (
+                          <>
+                            <p className="p-2 bg-gray-50 rounded">"Sem iluminação à noite" - Pedro</p>
+                            <p className="p-2 bg-gray-50 rounded">"Muito perigoso passar aqui" - Ana</p>
+                          </>
+                        )}
+                        {selectedLocation === 'vila' && (
+                          <>
+                            <p className="p-2 bg-gray-50 rounded">"Lixo acumulado há dias" - Carlos</p>
+                            <p className="p-2 bg-gray-50 rounded">"Precisa de limpeza urgente" - Lúcia</p>
+                          </>
+                        )}
+                        {selectedLocation === 'industrial' && (
+                          <>
+                            <p className="p-2 bg-gray-50 rounded">"Poluição do ar aumentou" - Roberto</p>
+                            <p className="p-2 bg-gray-50 rounded">"Trânsito de caminhões" - Sandra</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Demands;

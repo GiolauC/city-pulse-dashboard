@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { ConnectionStatus } from '@/components/ConnectionStatus';
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
@@ -32,16 +33,9 @@ export function AppSidebar() {
   const isCollapsed = state === 'collapsed';
 
   return (
-    <Sidebar collapsible="icon" className="rounded-r-2xl overflow-hidden">
+    <Sidebar collapsible="icon">
       <div className="flex items-center gap-3 p-4 border-b border-sidebar-border bg-sidebar">
         <img src={logo} alt="Sofia Logo" className={`h-8 ${isCollapsed ? 'mx-auto' : ''}`} />
-        {!isCollapsed && (
-          <div className="flex flex-col">
-            <span className="text-sidebar-foreground font-semibold text-sm">
-              Gestão Municipal
-            </span>
-          </div>
-        )}
       </div>
 
       <SidebarContent>
@@ -76,6 +70,12 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-sidebar-border">
         <div className="p-4 space-y-2">
+          {!isCollapsed && (
+            <div className="mb-3">
+              <ConnectionStatus />
+            </div>
+          )}
+          
           {!isCollapsed && profile && (
             <div className="text-xs text-sidebar-foreground/70 space-y-1 mb-3">
               <div className="flex items-center gap-2">
