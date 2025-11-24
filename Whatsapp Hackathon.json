@@ -1,0 +1,2127 @@
+{
+  "name": "Whatsapp Hackathon",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Divisão de Mensagens ",
+        "height": 440,
+        "width": 920,
+        "color": 7
+      },
+      "id": "c673e8bc-2ae1-4d6e-8017-8524e83a2c03",
+      "name": "Sticky Note19",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "clinica-youtube",
+        "options": {}
+      },
+      "id": "d214f237-1d0f-4881-873f-53e9bb456bae",
+      "name": "Webhook EVO",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        288
+      ],
+      "webhookId": "7ecd43ed-123c-4fef-b86d-f9ce39e55d64"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2f74b357-ea21-442a-9fc2-a558966a8e43",
+              "name": "Nome",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "26708c9c-ce53-4f6c-a3ce-437eb2b84920",
+              "name": "Mensagem",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "d5ebe46c-8b94-4c4e-90ed-5e8cc6df42bc",
+              "name": "Numero",
+              "value": "={{ $json.body.data.key.remoteJid }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        288
+      ],
+      "id": "e92767b0-9050-4b9c-8c0b-37b18260137b",
+      "name": "Dados"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=# 📌 PAPEL — Sof.IA\nVocê é **Sof.IA**, a assistente democrática criada para aproximar cidadãos da política pública.  \nAtua ajudando pessoas a:\n- Consultar projetos de lei (municipal, estadual e federal)\n- Registrar problemas urbanos com foto e localização\n- Enviar avaliações e comentários sobre leis\n- Acompanhar o que está acontecendo na cidade\n\nSempre use **mensagens curtas (2–3 linhas)**, simples, acolhedoras e cidadãs — como no WhatsApp.  \nNunca use linguagem técnica, política ou jurídica complexa.\n\n---\n\n# 🏗️ **FUNCIONAMENTO GERAL**\n\n## ✔️ **1. Coleta inicial de dados do cidadão (uma única vez)** E salvar essas informações na tool **salvaBancoDados*\nQuando o usuário interagir pela primeira vez, pergunte (uma por vez):\n- Nome (ou se deseja permanecer anônimo)\n- Idade (opcional)\n- Rua/Bairro\n- Cidade\n\n\n\n\nSe o usuário disser que **não quer fornecer dados**, registre como “anônimo”.\n\nDepois de coletado, **nunca pergunte novamente**, a menos que o usuário peça para atualizar.\n\nSe o usuário digitar **“voltar ao menu”**, use os dados já armazenados.\n\n---\n\n# 👋 **2. Saudação + menu inicial**\nSempre receber assim:\n\n\"Olá! Sou a Sof.IA, sua assistente democrática 🤝  \nComo posso te ajudar hoje?\n\n1️⃣ Ver projeto de lei da minha cidade  \n2️⃣ Ver projeto de lei estadual  \n3️⃣ Ver projeto de lei federal  \n4️⃣ Cadastrar um problema da minha cidade  \n5️⃣ Avaliar um projeto de lei  \n6️⃣ Voltar ao menu\"\n\n---\n\n# 🧭 **3. Identificação da solicitação**\n- Identifique exatamente qual opção o usuário escolheu.\n- Nunca faça mais de uma pergunta por vez.\n- Sempre responda com 1–2 linhas antes de perguntar algo.\n\nExemplo:  \nHumano: 1  \nSof.IA: \"Claro! Qual cidade você quer consultar?\"\n\n---\n\n# 🏙️ **4. Consultas de leis (municipal, estadual e federal)**\n\n### Para leis municipais:\n- Pergunte: **“Qual cidade você quer consultar?”**\n- Se os dados já estiverem cadastrados, pule a pergunta.\n\n### Para leis estaduais:\n- Pergunte: **“De qual estado você quer ver os projetos?”**\n\n### Para leis federais:\n- Pergunte: **“Sobre qual tema você quer consultar leis federais?”**\n\n### Regras:\n- Sempre resumir as leis em 2–3 linhas.\n- Se houver muitas, diga:\n  \"Encontrei X projetos. Quer ver o resumo do primeiro?\"\n\n---\n\n# 🛠️ **5. Cadastro de problemas urbanos**\nSiga sempre este fluxo simples:\n\n1. Pergunte:  \n   \"Pode me contar rapidamente qual é o problema?\"\n\n2. Peça a foto (opcional):  \n   \"Se quiser, pode enviar uma foto 😊\"\n\n3. Pergunte o local (rua/bairro).  \n   Se o dado já estiver salvo, use ele automaticamente.\n\n4. Pergunte uma descrição curta:  \n   \"Pode me dizer em 1 linha o que aconteceu?\"\n\n5. Confirme antes de registrar:  \n   \"Confirma que deseja registrar esse problema?\"\n\n6. Após confirmar:  \n   \"Perfeito! Problema registrado com sucesso 📍  \n   Obrigada por contribuir com sua cidade!\"\n\n---\n\n# ⭐ **6. Avaliação de leis**\nQuando o cidadão quiser avaliar um projeto de lei:\n\nPergunte:\n- \"Você aprova ou não aprova esse projeto?\" (botão)\n- \"Deseja deixar algum comentário de sugestão ou melhoria?\"\n\nDepois confirme o envio:\n\"Obrigado! Avaliação registrada com sucesso 🗳️\"\n\nO gestor poderá ver:\n- total de aprovações\n- total de rejeições\n- comentários enviados\n\n---\n\n# 🔄 **7. Retorno ao menu**\nSempre que o usuário escrever **“voltar ao menu”**, responda:\n\n\"Perfeito! Aqui está o menu novamente 👇  \n(usar o menu padrão)\"\n\n---\n\n# 🤝 **8. Encerramento**\nSempre finalize de forma acolhedora:\n\n\"Se precisar de mais alguma coisa, estou aqui para ajudar 🤝\"\n\n---\n\n# 🚫 Regras do que NÃO deve fazer\n- Não enviar textos longos\n- Não fazer mais de uma pergunta por mensagem\n- Não explicar como funciona o sistema interno\n- Não emitir opiniões políticas ou partidárias\n- Não inventar leis, artigos ou referências jurídicas\n- Não registrar nada sem confirmação final\n\n---\n\n# 📌 Observação sobre armazenamento\nVocê deve **lembrar internamente** (para o ciclo da conversa) os dados coletados:\n- name  \n- whatsapp_number  \n- age  \n- interaction_date  \n- localizacao  \n- estado  \n- cidade  \n- bairro  \n\nE só voltar a perguntar se o usuário pedir para atualizar as informações."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        240
+      ],
+      "id": "8139304d-fa8e-4b72-bdc6-949baaa148c3",
+      "name": "AI Agent",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3088,
+        240
+      ],
+      "id": "136d25c8-fa0d-4e88-a833-98d46ba9f188",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2896,
+        240
+      ],
+      "id": "b7262633-151c-47e7-b8ad-c4e5e3d884ea",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "## Filtro Dados\n- agregar dados úteis em um único node",
+        "height": 440,
+        "width": 220,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        128
+      ],
+      "id": "0da10614-918a-4898-8519-b389fedc2012",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Banco de dados\n- Verifica se o lead existe no Banco de dados\n- Se não existir cria o lead na tabela ",
+        "height": 440,
+        "width": 524,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        128
+      ],
+      "id": "85d6ff76-00cd-4e56-9e22-81c008f14a48",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2064,
+        416
+      ],
+      "id": "0639e3e1-46a3-4118-80b1-a3a656d7a6bc",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "v1aeEwz4ys7K16wN",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "52aaf749-fe4f-44e4-880e-15b2bfc027f1",
+                    "leftValue": "={{ $('Webhook EVO').item.json.body.data.messageType }}",
+                    "rightValue": "extendedTextMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "e514e613-fd6a-48bd-b0ae-bae2448c810e",
+                    "leftValue": "={{ $('Webhook EVO').item.json.body.data.messageType }}",
+                    "rightValue": "conversation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook EVO').item.json.body.data.messageType }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3e8f5a11-6186-48b2-b834-065e961cb538"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "d62b06ec-cac6-4aa7-b936-fa26e1f2488d",
+                    "leftValue": "={{ $('Webhook EVO').item.json.body.data.messageType }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8c699f4c-5ba4-4ad1-806b-a6d569735d9d",
+      "name": "Switch1",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        480,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "fileName": "file.ogg",
+          "mimeType": "application/ogg"
+        }
+      },
+      "id": "1393faac-97ac-435b-8835-fc8a3ba17231",
+      "name": "Convert to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Filtro Texto/Audio\n",
+        "height": 440,
+        "width": 964,
+        "color": 7
+      },
+      "id": "2113857f-9f66-4928-b730-359ff19c629b",
+      "name": "Sticky Note14",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        400,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c5ccbc9-69d1-4b13-a7c3-e6945bc8c655",
+              "name": "data",
+              "value": "={{ $('Webhook EVO').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "de915cb2-c36a-4621-bde2-5680ef469d3d",
+      "name": "Edit Fields1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68f2163b-37a2-49e6-93d2-1fabb50305d0",
+              "name": "text",
+              "value": "={{ $('Webhook EVO').item.json.body.data.message.conversation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        224
+      ],
+      "id": "07425cde-3187-47bd-8d6d-d677d4aaf609",
+      "name": "text"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "6f961c57-5bae-4add-a43d-e73fa35374c8",
+      "name": "transcript",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.6,
+      "position": [
+        1168,
+        448
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "v1aeEwz4ys7K16wN",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54020458-c901-4bba-8e6d-06e32d80ba5d",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1200,
+        224
+      ],
+      "id": "7efc348c-c34c-4dad-9813-7ca425155436",
+      "name": "finalText"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "=buffer: {{ $('Dados').item.json.Numero }}",
+        "messageData": "={{ $('finalText').item.json.text }}",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        240
+      ],
+      "id": "d743fa34-6829-4c6e-86d0-28d791e0a6e9",
+      "name": "push",
+      "credentials": {
+        "redis": {
+          "id": "difrL9E2culuAViS",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "=1"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1648,
+        240
+      ],
+      "id": "5492ee61-0ec3-47a7-8b85-01b7208c06fd",
+      "name": "Wait",
+      "webhookId": "43aa8e0d-8bb5-48d9-b869-620cb9651025"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "msgs",
+        "key": "=buffer: {{ $('Dados').item.json.Numero }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        240
+      ],
+      "id": "0aa56cd6-d180-4f1a-97c3-824cdb3f0880",
+      "name": "msgs",
+      "credentials": {
+        "redis": {
+          "id": "difrL9E2culuAViS",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "42afc77a-7ce3-48c1-bccf-e26a7b291ad8",
+              "leftValue": "={{ $json.msgs.last() }}",
+              "rightValue": "={{ $('finalText').item.json.text }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        400
+      ],
+      "id": "9e6f87e6-1e11-49a3-a6de-0662aff44c80",
+      "name": "filterBuffer"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=buffer: {{ $('Dados').item.json.Numero }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        400
+      ],
+      "id": "0f4aeb00-497f-4420-b371-1fdbabc860e4",
+      "name": "deleteBuffer",
+      "credentials": {
+        "redis": {
+          "id": "difrL9E2culuAViS",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Buffer\n- Espera para juntar mensagens Picotadas",
+        "height": 440,
+        "width": 664,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        128
+      ],
+      "id": "ad709e7b-6bb6-40cb-87c6-ee38bdc43d20",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e3bdb73-4771-4318-9ebd-73085f56ae4e",
+              "name": "text",
+              "value": "={{ $('filterBuffer').item.json.msgs.join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1808,
+        400
+      ],
+      "id": "2e59f628-004e-4f7e-88a7-70eda14e06c3",
+      "name": "junta_msgs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4a6d9aac-8565-4c58-abe3-8741393a5535",
+              "leftValue": "={{ $json.telefone }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        288
+      ],
+      "id": "a5adb4b3-1948-49f4-82fe-0a526e1018a8",
+      "name": "já_existe_numero"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f542bcc-2975-4a9a-ac4a-1c1a10c3f194",
+              "name": "output",
+              "value": "={{ $json.output.mensagem.split('\\n\\n') }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2720,
+        240
+      ],
+      "id": "f848e031-48d6-452b-af9c-f108e4284aad",
+      "name": "divide_msgs"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3328,
+        224
+      ],
+      "id": "35b7d729-660a-4aaa-aa61-1f5d5a5c2783",
+      "name": "End"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Dados').item.json.Numero }}",
+        "tableName": "n8n_chat_historiesHackaton2",
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2160,
+        416
+      ],
+      "id": "8542d0a6-dece-4e42-b477-28fb11d945b4",
+      "name": "Chat",
+      "credentials": {
+        "postgres": {
+          "id": "qymavDTE5prhQdDp",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://mega-suporte-n8n.sqbhdq.easypanel.host/mcp/clinica-x/sse",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.1,
+      "position": [
+        2256,
+        416
+      ],
+      "id": "c0d56025-e0a0-4e89-bff5-a66cb1797da8",
+      "name": "agendamentos"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "create table dados_cliente (\n  id bigserial primary key,\n  created_at TIMESTAMPTZ, \n  telefone text, \n  nomewpp text\n);",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        -240,
+        -224
+      ],
+      "id": "5fc39d29-4c7c-4f09-947f-892b878e08f6",
+      "name": "Cria Tabela Dados Cliente",
+      "credentials": {
+        "postgres": {
+          "id": "qymavDTE5prhQdDp",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Criar tabela banco de dados",
+        "height": 272,
+        "width": 320,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -304
+      ],
+      "id": "9d2377aa-f197-4f20-80ef-79dc155cfd6f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "tableId": "dados_cliente",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "telefone",
+              "fieldValue": "={{ $('Dados').item.json.Numero }}"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $now }}"
+            },
+            {
+              "fieldId": "nomewpp",
+              "fieldValue": "={{ $('Dados').item.json.Nome }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        272,
+        384
+      ],
+      "id": "4bf260fb-45e0-467f-8739-0dfd0d0b197b",
+      "name": "criar_lead",
+      "credentials": {
+        "supabaseApi": {
+          "id": "xXwkzefNhE208YN9",
+          "name": "SERVIDOR HOST"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "dados_cliente",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "telefone",
+              "keyValue": "={{ $json.Numero }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        288
+      ],
+      "id": "11fafadc-09e1-4def-8f38-3cc6f5eaf1fc",
+      "name": "Consulta se o Lead existe",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "xXwkzefNhE208YN9",
+          "name": "SERVIDOR HOST"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use esta ferramenta para reagendar um evento. \n- Sempre use a ferramenta \"listar_eventos\" antes de usar esta ferramenta. \n- Quando atualizado com sucesso, retorne o 'id' como (aoqcj5f0b6qs5591brfm14g6gsc).\n- Retorne \"status\": \"agendado\"\n",
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "ca65b36490f8f0e06c8cb70a423920c5c4fa670c66e83242c8c1d8d3b4bca1b8@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Karen"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {
+          "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+          "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        928
+      ],
+      "id": "98159267-aafe-465f-9b48-acf14b557880",
+      "name": "reagendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "NOcF2iq7WvGbgUac",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=# PAPEL\nVocê executa **consulta de disponibilidade** da Clínica Olimphia identificando horários LIVRES para agendamento.\n\n## INSTRUÇÕES\n\n### PASSO 1 - OBRIGATÓRIO: Declare o dia da semana\n* \"O dia X cai em um [dia da semana]\"\n* Use {{$now}} como referência para calcular\n\n### PASSO 2 - OBRIGATÓRIO: Valide se é dia útil\n* Se **SÁBADO/DOMINGO:** PARE e responda: \"O dia X cai em um [sábado/domingo]. Não atendemos nos finais de semana. Posso sugerir horários dos próximos dias úteis?\"\n* Se **SEGUNDA-SEXTA:** Prossiga para PASSO 3\n\n### PASSO 3 - OBRIGATÓRIO: Consulte eventos ocupados\n* Busque TODOS os agendamentos do dia solicitado\n* Calcule horários DISPONÍVEIS (8h às 18h menos ocupados)\n* **NUNCA** diga \"não temos horários\" sem consultar\n\n### PASSO 4 - OBRIGATÓRIO: Apresente disponibilidade com REGRA DO BUFFER DE 30 MINUTOS\n\n**REGRA CRÍTICA DO BUFFER:** O buffer de 30 minutos se aplica APENAS para horários disponíveis que terminam IMEDIATAMENTE ANTES de um horário ocupado.\n\n**Quando aplicar o buffer:**\n* ✅ Horário disponível termina e logo depois tem ocupado → aplicar buffer\n* ❌ Horário disponível começa depois de um ocupado → SEM buffer\n\n**Exemplos práticos:**\n* **Ocupado às 11h:**\n  - ✅ Das 8h às 10h30 (buffer aplicado - termina antes do ocupado)\n  - ✅ Das 11h30 às 18h (sem buffer - começa depois do ocupado)\n  \n* **Ocupado das 14h às 15h:**\n  - ✅ Das 8h às 13h30 (buffer aplicado - termina antes do ocupado)\n  - ✅ Das 15h às 18h (sem buffer - começa depois do ocupado)\n\n**Apresentação dos horários:**\n\n**Se tiver horários livres:**\n* Agrupe por período: manhã (8h-12h) / tarde (13h-18h)\n* **Horários consecutivos:** \"das 8h às 10h30, das 11h30 às 12h\"\n* **Horários isolados:** \"às 15h, às 16h30\"\n* **Exemplo:** \"Temos pela manhã das 8h às 10h30 e das 11h30 às 12h; à tarde das 13h às 18h\"\n\n**Se realmente sem horários:**\n* \"O dia X está completamente ocupado. Posso sugerir outros dias?\"\n\n## CONTEXTO\nVocê deve SEMPRE consultar os eventos ocupados primeiro para calcular disponibilidade real. O buffer de 30 minutos evita que pacientes cheguem muito próximo ao horário seguinte ocupado, mas NÃO afeta horários que começam após um ocupado.\n\n## REGRAS\n* ✅ **SEMPRE** consultar eventos ocupados antes de responder\n* ✅ **SEMPRE** calcular disponibilidade real (8h-18h menos ocupados)\n* ✅ **BUFFER DE 30 MIN:** Aplicar APENAS quando faixa disponível termina imediatamente antes de ocupado\n* ✅ **SEM BUFFER:** Quando faixa disponível começa após um ocupado\n* ✅ **SEMPRE** apresentar horários livres agrupados por período\n* ❌ **NUNCA** dizer \"não temos horários\" sem consultar sistema\n* ❌ **NUNCA** pular a consulta de eventos ocupados\n* ❌ **NUNCA** aplicar buffer desnecessariamente em horários após ocupados\n\n## EXEMPLO PRÁTICO\n**Cenário:** Apenas 10h às 11h ocupado\n**Resposta correta:** \"Temos pela manhã das 8h às 9h30 e das 11h às 12h; à tarde das 13h às 18h.\"\n- ✅ 8h às 9h30 (buffer aplicado - termina antes do ocupado)\n- ✅ 11h às 12h (sem buffer - começa depois do ocupado)\n- ✅ 13h às 18h (sem buffer - não há ocupado depois)",
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "ca65b36490f8f0e06c8cb70a423920c5c4fa670c66e83242c8c1d8d3b4bca1b8@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Karen"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2144,
+        928
+      ],
+      "id": "3a93074d-f26b-40a7-b5cc-67b3f7374d54",
+      "name": "listar_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "NOcF2iq7WvGbgUac",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use essa tool para criação de novos agendamentos \n\n# REGRAS\n- Apenas crie o evento apos o a confirmação\n- Use `listar_eventos` para verificar se o horário ainda está disponível\n- Crie apenas se o horário estiver disponível\n- Retorne o EvenId para confirmação\n- Retorne \"status\": \"agendado\"\n- ❌ **NUNCA** criar se horário ocupado\n- ❌ **NUNCA** criar sem confirmação ",
+        "calendar": {
+          "__rl": true,
+          "value": "ca65b36490f8f0e06c8cb70a423920c5c4fa670c66e83242c8c1d8d3b4bca1b8@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Karen"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "useDefaultReminders": false,
+        "additionalFields": {
+          "attendees": [],
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2256,
+        928
+      ],
+      "id": "dd789eb4-be51-4957-a759-76f50edd035b",
+      "name": "criar_evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "NOcF2iq7WvGbgUac",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use essa ferramenta para cancelar um evento já criado com EventId\n- Apenas cancele se o lead confirmar\n- Retorne \"status\": \"cancelado\"",
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "ca65b36490f8f0e06c8cb70a423920c5c4fa670c66e83242c8c1d8d3b4bca1b8@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Karen"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        2480,
+        928
+      ],
+      "id": "7ba210bc-1f02-40e3-8f06-d4a5cae1f993",
+      "name": "deletar_evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "NOcF2iq7WvGbgUac",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "clinica-x"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        2224,
+        768
+      ],
+      "id": "c10f84dd-db4f-4cbc-8ed1-0f7487f914d4",
+      "name": "MCP Agendamento",
+      "webhookId": "dc82314e-4fdd-4ca7-b837-fdff00495580",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "content": "## Agendamento",
+        "height": 448,
+        "width": 608,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        672
+      ],
+      "typeVersion": 1,
+      "id": "8abd171f-a70c-4672-8d90-3dcd49cb6cfb",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## AGENTE DE IA ",
+        "height": 440,
+        "width": 616,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        128
+      ],
+      "id": "6b13a2ee-a5ce-4b49-9f65-09f62c27192a",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "NEOSPACE",
+        "remoteJid": "={{ $('Dados').item.json.Numero }}",
+        "messageText": "={{ $json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        3328,
+        384
+      ],
+      "id": "62ffb396-ab15-4a72-883a-4b66734a348d",
+      "name": "Enviar texto",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ORWAKSiqEYikD6Xe",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"mensagem\": \"sua resposta confirmando o agendamento\",\n  \"event_id\": \"id_do_evento_criado\",\n  \"patient_name\": \"Nome do Paciente\",\n  \"dateTime\": \"2025-08-04T08:00:00-03:00\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        416
+      ],
+      "id": "cba48a00-999c-46b4-a022-accfe7745e80",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2368,
+        528
+      ],
+      "id": "13b36a35-b4b1-49c7-9bba-c94e8ecc5943",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "zu4nZ1VmLITl5iAA",
+          "name": "UbaGPT"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -208
+      ],
+      "id": "0295f0af-4564-4f0f-b0a2-056582b7c0f3",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "xXwkzefNhE208YN9",
+          "name": "SERVIDOR HOST"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.0-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.0-flash"
+        },
+        "text": "=What's in this image? {{ $('Webhook EVO').item.json.body.data.messageType }}",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        944,
+        848
+      ],
+      "id": "5098c95a-2f90-4b6c-acf6-afec51ebbb24",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "StEhx1TvQ0FWZFw7",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c5ccbc9-69d1-4b13-a7c3-e6945bc8c655",
+              "name": "data",
+              "value": "={{ $('Webhook EVO').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "77185227-3c93-469d-afe0-c00c9f58f14d",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        864
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $('Webhook EVO').item.json.instancia }}",
+        "messageId": "={{ $('Webhook EVO').item.json.idMensagem }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -112
+      ],
+      "id": "af2ab494-a827-4e71-9e1c-b1d3d738d49e",
+      "name": "Obter m dia em base",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ORWAKSiqEYikD6Xe",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {
+          "mimeType": "audio/mpeg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        -112
+      ],
+      "id": "b8feae56-46ac-4fc2-89a1-eca17d862de4",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/audio/transcriptions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=bearer {{ $('Configuration Global1').item.json.chave_groq }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-large-v3-turbo"
+            },
+            {
+              "name": "temperature",
+              "value": "0"
+            },
+            {
+              "name": "response_format",
+              "value": "verbose_json"
+            },
+            {
+              "name": "language",
+              "value": "pt"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1472,
+        -112
+      ],
+      "id": "81500e28-b099-4b06-8571-3d1f2a0066a8",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7b00a91a-ceae-46fb-b8be-4392d5357efb",
+              "name": "Mensagem",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        -112
+      ],
+      "id": "41b3af62-b375-4935-b9a7-d84561bc8c70",
+      "name": "Set Transcrition1"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $('Webhook EVO').item.json.body.instance }}",
+        "messageId": "={{ $('Webhook EVO').item.json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        784,
+        656
+      ],
+      "id": "4713fdb0-ca82-47ef-aff8-ee85031de17b",
+      "name": "Obter m dia em base1",
+      "credentials": {
+        "evolutionApi": {
+          "id": "ORWAKSiqEYikD6Xe",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {
+          "mimeType": "audio/mpeg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        656
+      ],
+      "id": "3dce17fc-a654-43aa-8755-621665377b24",
+      "name": "Convert to File2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ixpqqWaVduux6NYJ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ixpqqWaVduux6NYJ",
+          "cachedResultName": "salvaBancoDados"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idade": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('idade', ``, 'number') }}",
+            "nome": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('nome', ``, 'string') }}",
+            "localizacao": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('localizacao', ``, 'string') }}",
+            "estado": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('estado', ``, 'string') }}",
+            "cidade": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cidade', ``, 'string') }}",
+            "bairro": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('bairro', ``, 'string') }}",
+            "interaction_date": "={{ $now }}",
+            "whatsapp": "={{ $('Consulta se o Lead existe').item.json.telefone }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "whatsapp",
+              "displayName": "whatsapp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "idade",
+              "displayName": "idade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "localizacao",
+              "displayName": "localizacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "cidade",
+              "displayName": "cidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "bairro",
+              "displayName": "bairro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "interaction_date",
+              "displayName": "interaction_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        2560,
+        544
+      ],
+      "id": "f7d393de-df0e-4044-9650-ae082adf100a",
+      "name": "salvaBancoDados"
+    }
+  ],
+  "pinData": {
+    "Webhook EVO": [
+      {
+        "json": {
+          "headers": {
+            "host": "mega-suporte-n8n.sqbhdq.easypanel.host",
+            "user-agent": "axios/1.12.2",
+            "content-length": "3431",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "172.18.0.1",
+            "x-forwarded-host": "mega-suporte-n8n.sqbhdq.easypanel.host",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "c3a8b95453a7",
+            "x-real-ip": "172.18.0.1"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "NEOSPACE",
+            "data": {
+              "key": {
+                "remoteJid": "553299908165@s.whatsapp.net",
+                "remoteJidAlt": "22724823019551@lid",
+                "fromMe": false,
+                "id": "A5ADD660AA8A27C446C43A3478095065",
+                "participant": "",
+                "addressingMode": "pn"
+              },
+              "pushName": "www.FelipeCandian.com",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "audioMessage": {
+                  "url": "https://mmg.whatsapp.net/v/t62.7117-24/34522891_1199356995415867_5148273075250609718_n.enc?ccb=11-4&oh=01_Q5Aa3AEeDXQB02VI9PVwpk3F0EHRWUnMmSNNzH-NtmEpNEVQ3A&oe=694A0689&_nc_sid=5e03e0&mms3=true",
+                  "mimetype": "audio/ogg; codecs=opus",
+                  "fileSha256": {
+                    "0": 110,
+                    "1": 67,
+                    "2": 53,
+                    "3": 142,
+                    "4": 208,
+                    "5": 89,
+                    "6": 125,
+                    "7": 133,
+                    "8": 126,
+                    "9": 228,
+                    "10": 230,
+                    "11": 249,
+                    "12": 39,
+                    "13": 54,
+                    "14": 18,
+                    "15": 186,
+                    "16": 12,
+                    "17": 144,
+                    "18": 197,
+                    "19": 208,
+                    "20": 189,
+                    "21": 245,
+                    "22": 57,
+                    "23": 67,
+                    "24": 21,
+                    "25": 223,
+                    "26": 161,
+                    "27": 199,
+                    "28": 27,
+                    "29": 224,
+                    "30": 76,
+                    "31": 3
+                  },
+                  "fileLength": {
+                    "low": 13912,
+                    "high": 0,
+                    "unsigned": true
+                  },
+                  "seconds": 6,
+                  "ptt": true,
+                  "mediaKey": {
+                    "0": 242,
+                    "1": 92,
+                    "2": 118,
+                    "3": 173,
+                    "4": 188,
+                    "5": 156,
+                    "6": 60,
+                    "7": 238,
+                    "8": 137,
+                    "9": 116,
+                    "10": 17,
+                    "11": 113,
+                    "12": 61,
+                    "13": 195,
+                    "14": 147,
+                    "15": 159,
+                    "16": 156,
+                    "17": 231,
+                    "18": 89,
+                    "19": 221,
+                    "20": 147,
+                    "21": 217,
+                    "22": 128,
+                    "23": 232,
+                    "24": 125,
+                    "25": 217,
+                    "26": 112,
+                    "27": 138,
+                    "28": 31,
+                    "29": 155,
+                    "30": 73,
+                    "31": 39
+                  },
+                  "fileEncSha256": {
+                    "0": 243,
+                    "1": 25,
+                    "2": 8,
+                    "3": 159,
+                    "4": 216,
+                    "5": 81,
+                    "6": 253,
+                    "7": 113,
+                    "8": 12,
+                    "9": 47,
+                    "10": 237,
+                    "11": 184,
+                    "12": 245,
+                    "13": 134,
+                    "14": 136,
+                    "15": 151,
+                    "16": 8,
+                    "17": 63,
+                    "18": 162,
+                    "19": 144,
+                    "20": 19,
+                    "21": 192,
+                    "22": 166,
+                    "23": 67,
+                    "24": 94,
+                    "25": 177,
+                    "26": 102,
+                    "27": 243,
+                    "28": 154,
+                    "29": 71,
+                    "30": 84,
+                    "31": 86
+                  },
+                  "directPath": "/v/t62.7117-24/34522891_1199356995415867_5148273075250609718_n.enc?ccb=11-4&oh=01_Q5Aa3AEeDXQB02VI9PVwpk3F0EHRWUnMmSNNzH-NtmEpNEVQ3A&oe=694A0689&_nc_sid=5e03e0",
+                  "mediaKeyTimestamp": {
+                    "low": 1763875959,
+                    "high": 0,
+                    "unsigned": false
+                  },
+                  "waveform": {
+                    "0": 0,
+                    "1": 0,
+                    "2": 0,
+                    "3": 0,
+                    "4": 0,
+                    "5": 0,
+                    "6": 0,
+                    "7": 0,
+                    "8": 0,
+                    "9": 0,
+                    "10": 0,
+                    "11": 0,
+                    "12": 0,
+                    "13": 0,
+                    "14": 0,
+                    "15": 0,
+                    "16": 0,
+                    "17": 0,
+                    "18": 0,
+                    "19": 17,
+                    "20": 0,
+                    "21": 0,
+                    "22": 0,
+                    "23": 0,
+                    "24": 0,
+                    "25": 2,
+                    "26": 4,
+                    "27": 7,
+                    "28": 0,
+                    "29": 0,
+                    "30": 10,
+                    "31": 0,
+                    "32": 0,
+                    "33": 0,
+                    "34": 0,
+                    "35": 0,
+                    "36": 0,
+                    "37": 16,
+                    "38": 13,
+                    "39": 31,
+                    "40": 41,
+                    "41": 37,
+                    "42": 28,
+                    "43": 15,
+                    "44": 11,
+                    "45": 48,
+                    "46": 41,
+                    "47": 10,
+                    "48": 45,
+                    "49": 43,
+                    "50": 32,
+                    "51": 3,
+                    "52": 0,
+                    "53": 28,
+                    "54": 0,
+                    "55": 43,
+                    "56": 31,
+                    "57": 11,
+                    "58": 21,
+                    "59": 33,
+                    "60": 22,
+                    "61": 6,
+                    "62": 5,
+                    "63": 0
+                  }
+                },
+                "messageContextInfo": {
+                  "deviceListMetadata": {
+                    "senderKeyIndexes": [],
+                    "recipientKeyIndexes": [],
+                    "senderKeyHash": {
+                      "0": 222,
+                      "1": 125,
+                      "2": 190,
+                      "3": 30,
+                      "4": 72,
+                      "5": 240,
+                      "6": 254,
+                      "7": 204,
+                      "8": 37,
+                      "9": 205
+                    },
+                    "senderTimestamp": {
+                      "low": 1763768856,
+                      "high": 0,
+                      "unsigned": true
+                    },
+                    "recipientKeyHash": {
+                      "0": 192,
+                      "1": 233,
+                      "2": 56,
+                      "3": 142,
+                      "4": 80,
+                      "5": 81,
+                      "6": 0,
+                      "7": 131,
+                      "8": 66,
+                      "9": 230
+                    },
+                    "recipientTimestamp": {
+                      "low": 1763748007,
+                      "high": 0,
+                      "unsigned": true
+                    }
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": {
+                    "0": 32,
+                    "1": 233,
+                    "2": 191,
+                    "3": 228,
+                    "4": 183,
+                    "5": 62,
+                    "6": 175,
+                    "7": 244,
+                    "8": 60,
+                    "9": 233,
+                    "10": 113,
+                    "11": 65,
+                    "12": 109,
+                    "13": 249,
+                    "14": 154,
+                    "15": 137,
+                    "16": 217,
+                    "17": 20,
+                    "18": 136,
+                    "19": 212,
+                    "20": 93,
+                    "21": 129,
+                    "22": 197,
+                    "23": 104,
+                    "24": 253,
+                    "25": 255,
+                    "26": 233,
+                    "27": 130,
+                    "28": 127,
+                    "29": 79,
+                    "30": 97,
+                    "31": 248
+                  }
+                }
+              },
+              "contextInfo": null,
+              "messageType": "audioMessage",
+              "messageTimestamp": 1763875965,
+              "instanceId": "1ae2693f-cf19-419e-b1bb-29be5ca0824b",
+              "source": "android",
+              "chatwootMessageId": 1205,
+              "chatwootInboxId": 9,
+              "chatwootConversationId": 119
+            },
+            "destination": "https://mega-suporte-n8n.sqbhdq.easypanel.host/webhook/clinica-youtube",
+            "date_time": "2025-11-23T02:32:46.201Z",
+            "sender": "553298008610@s.whatsapp.net",
+            "server_url": "https://mega-suporte-evolution-api.sqbhdq.easypanel.host",
+            "apikey": "65A0DEFEB39F-4C67-92AE-FB9F4BD00ED2"
+          },
+          "webhookUrl": "https://mega-suporte-n8n.sqbhdq.easypanel.host/webhook/clinica-youtube",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook EVO": {
+      "main": [
+        [
+          {
+            "node": "Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dados": {
+      "main": [
+        [
+          {
+            "node": "Consulta se o Lead existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "divide_msgs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Enviar texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Obter m dia em base1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text": {
+      "main": [
+        [
+          {
+            "node": "finalText",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "transcript": {
+      "main": [
+        [
+          {
+            "node": "finalText",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finalText": {
+      "main": [
+        [
+          {
+            "node": "push",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "push": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "msgs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "msgs": {
+      "main": [
+        [
+          {
+            "node": "filterBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "filterBuffer": {
+      "main": [
+        [
+          {
+            "node": "deleteBuffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "deleteBuffer": {
+      "main": [
+        [
+          {
+            "node": "junta_msgs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "junta_msgs": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "já_existe_numero": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "criar_lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "divide_msgs": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agendamentos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar_lead": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consulta se o Lead existe": {
+      "main": [
+        [
+          {
+            "node": "já_existe_numero",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reagendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Agendamento",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listar_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Agendamento",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "criar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Agendamento",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "deletar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Agendamento",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar texto": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria Tabela Dados Cliente": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obter m dia em base": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Set Transcrition1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obter m dia em base1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File2": {
+      "main": [
+        [
+          {
+            "node": "transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "salvaBancoDados": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3d3bfa29-39fa-4943-9587-5dae0f3ec3ab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7f9b3af326516c18eaadbf8f92a0116159976e0a6252ecfd199be55d8c45a964"
+  },
+  "id": "Bwon2smMzDPQ7W8X",
+  "tags": []
+}
